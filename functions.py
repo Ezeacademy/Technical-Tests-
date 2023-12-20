@@ -1,22 +1,19 @@
 def mostrar_informacion(datos):
-    # all information acount
-    print("Número de cuenta:", datos["cuenta"])
-    print("Apellido y nombre:", datos["apellido"].upper() + ",", datos["nombre"])
+    # Extract account information
+    cuenta = datos["cuenta"]
+    apellido = datos["apellido"].upper()
+    nombre = datos["nombre"]
 
     # Sort installments by installment number
     cuotas_ordenadas = sorted(datos["cuotas"], key=lambda x: x["cuota"])
 
-    print(cuotas_ordenadas)
-
-    # Initialize variables for odds range and grand total
-    rango_inicial = cuotas_ordenadas[0]["cuota"]
-    rango_final = cuotas_ordenadas[-1]["cuota"]
     total_general = 0
 
-    # Function to display the information of a range of quotas
-    def mostrar_rango():
-        nonlocal rango_inicial, rango_final
+    # Function to display the information of a range of installments
+    def mostrar_rango(rango_inicial, rango_final):
+        # Calculate the total amount for the specified installment range
         importe_total = sum(cuota["importe"] for cuota in cuotas_ordenadas if rango_inicial <= cuota["cuota"] <= rango_final)
+        # Print information for the installment range
         print(importe_total)
         print(f"\nCuotas Pendientes: {rango_inicial} - {rango_final}")
         print(f"Importe adeudado: ${importe_total:.2f}\n")
@@ -26,23 +23,32 @@ def mostrar_informacion(datos):
     def es_consecutiva(cuota_anterior, cuota_actual):
         return cuota_actual - cuota_anterior == 1
 
-    # browse quotas and show information
+    # Initialize variables for the installment range
+    rango_inicial = cuotas_ordenadas[0]["cuota"]
+    rango_final = rango_inicial
+
+    # Iterate through installments to display information
     for i in range(1, len(cuotas_ordenadas)):
         cuota_actual = cuotas_ordenadas[i]["cuota"]
         cuota_anterior = cuotas_ordenadas[i - 1]["cuota"]
 
+        # Check if the current installment is consecutive to the previous one
         if es_consecutiva(cuota_anterior, cuota_actual):
             rango_final = cuota_actual
         else:
-            total_general += mostrar_rango()
+            # Display information for the current installment range and update total
+            total_general += mostrar_rango(rango_inicial, rango_final)
             rango_inicial = cuota_actual
             rango_final = cuota_actual
 
-    # show total general
-    total_general += mostrar_rango()
+    # Display information for the last installment range
+    total_general += mostrar_rango(rango_inicial, rango_final)
 
-    # Show grand total
-    print("Total: ${:.2f}".format(total_general))
+    # Display account information and grand total
+    print(f"Número de cuenta: {cuenta}")
+    print(f"Apellido y nombre: {apellido}, {nombre}")
+    print(cuotas_ordenadas)
+    print(f"Total: ${total_general:.2f}")
 
 
 # Example data
